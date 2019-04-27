@@ -16,7 +16,7 @@ PARTICULAR PURPOSE. See the GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License along with
 libviso2; if not, write to the Free Software Foundation, Inc., 51 Franklin
-Street, Fifth Floor, Boston, MA 02110-1301, USA 
+Street, Fifth Floor, Boston, MA 02110-1301, USA
 */
 
 #ifndef VISO_MONO_H
@@ -46,10 +46,10 @@ public:
 
   // constructor, takes as inpute a parameter structure
   VisualOdometryMono (parameters param);
-  
+
   // deconstructor
   ~VisualOdometryMono ();
-  
+
   // process a new image, pushs the image back to an internal ring buffer.
   // valid motion estimates are available after calling process for two times.
   // inputs: I ......... pointer to rectified image (uint8, row-aligned)
@@ -63,25 +63,29 @@ public:
   // output: returns false if motion too small or an error occured
   bool process (uint8_t *I,int32_t* dims,bool replace=false);
 
+  const std::vector<Matcher::p_match> getRawMatches() const {
+    return matcher->getRawMatches();
+  }
+
 private:
 
   template<class T> struct idx_cmp {
     idx_cmp(const T arr) : arr(arr) {}
     bool operator()(const size_t a, const size_t b) const { return arr[a] < arr[b]; }
     const T arr;
-  };  
+  };
 
-  std::vector<double>  estimateMotion (std::vector<Matcher::p_match> p_matched);  
+  std::vector<double>  estimateMotion (std::vector<Matcher::p_match> p_matched,
+                                       const std::vector<double> &initial_guess);
   Matrix               smallerThanMedian (Matrix &X,double &median);
   bool                 normalizeFeaturePoints (std::vector<Matcher::p_match> &p_matched,Matrix &Tp,Matrix &Tc);
   void                 fundamentalMatrix (const std::vector<Matcher::p_match> &p_matched,const std::vector<int32_t> &active,Matrix &F);
   void                 EtoRt(Matrix &E,Matrix &K,std::vector<Matcher::p_match> &p_matched,Matrix &X,Matrix &R,Matrix &t);
   int32_t              triangulateChieral (std::vector<Matcher::p_match> &p_matched,Matrix &K,Matrix &R,Matrix &t,Matrix &X);
   std::vector<int32_t> getInlier (std::vector<Matcher::p_match> &p_matched,Matrix &F);
-  
+
   // parameters
-  parameters param;  
+  parameters param;
 };
 
 #endif // VISO_MONO_H
-

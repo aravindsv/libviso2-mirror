@@ -20,7 +20,7 @@ Street, Fifth Floor, Boston, MA 02110-1301, USA
 */
 
 /*
-  Documented C++ sample code of monocular visual odometry (modify to your needs)
+  Documented C++ sample code of stereo visual odometry (modify to your needs)
   To run this demonstration, download the Karlsruhe dataset sequence
   '2010_03_09_drive_0019' from: www.cvlibs.net!
   Usage: ./viso2 path/to/sequence/2010_03_09_drive_0019
@@ -33,7 +33,7 @@ Street, Fifth Floor, Boston, MA 02110-1301, USA
 #include <stdint.h>
 #include <chrono>
 
-#include <viso_mono.h>
+#include <viso_stereo.h>
 #include <png++/png.hpp>
 
 using namespace std;
@@ -50,18 +50,17 @@ int main (int argc, char** argv) {
   string dir = argv[1];
 
   // set most important visual odometry parameters
-  // for a full parameter list, look at: viso_mono.h
-  VisualOdometryMono::parameters param;
+  // for a full parameter list, look at: viso_stereo.h
+  VisualOdometryStereo::parameters param;
 
   // calibration parameters for sequence 2010_03_09_drive_0019
   param.calib.f  = 645.24; // focal length in pixels
   param.calib.cu = 635.96; // principal point (u-coordinate) in pixels
   param.calib.cv = 194.13; // principal point (v-coordinate) in pixels
-  param.height      = 0.6; // height above ground in meters
-  param.pitch     = -0.08; // camera pitch
+  param.base     = 0.5707; // baseline in meters
 
   // init visual odometry
-  VisualOdometryMono viso(param);
+  VisualOdometryStereo viso(param);
 
   // current pose (this matrix transforms a point from the current
   // frame's camera coordinates to the first frame's camera coordinates)
@@ -85,6 +84,7 @@ int main (int argc, char** argv) {
 
       // load left and right input image
       png::image< png::gray_pixel > left_img(left_img_file_name);
+      png::image< png::gray_pixel > right_img(right_img_file_name);
 
       // image dimensions
       int32_t width  = left_img.get_width();
@@ -92,10 +92,12 @@ int main (int argc, char** argv) {
 
       // convert input images to uint8_t buffer
       uint8_t* left_img_data  = (uint8_t*)malloc(width*height*sizeof(uint8_t));
+      uint8_t* right_img_data = (uint8_t*)malloc(width*height*sizeof(uint8_t));
       int32_t k=0;
       for (int32_t v=0; v<height; v++) {
         for (int32_t u=0; u<width; u++) {
           left_img_data[k]  = left_img.get_pixel(u,v);
+          right_img_data[k] = right_img.get_pixel(u,v);
           k++;
         }
       }
@@ -106,7 +108,7 @@ int main (int argc, char** argv) {
       // compute visual odometry
       int32_t dims[] = {width,height,width};
       auto start_time = chrono::high_resolution_clock::now();
-      if (viso.process(left_img_data,dims)) {
+      if (viso.process(left_img_data,right_img_data,dims)) {
         auto end_time = chrono::high_resolution_clock::now();
         chrono::duration<double> elapsed_time = end_time - start_time;
         times.push_back(elapsed_time.count());
@@ -130,6 +132,7 @@ int main (int argc, char** argv) {
 
       // release uint8_t buffers
       free(left_img_data);
+      free(right_img_data);
 
     // catch image read errors here
     } catch (...) {
