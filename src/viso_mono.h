@@ -67,6 +67,9 @@ public:
     return matcher->getRawMatches();
   }
 
+  std::vector<double>  estimateMotion (std::vector<Matcher::p_match> p_matched,
+                                       const std::vector<double> &initial_guess);
+
 private:
 
   template<class T> struct idx_cmp {
@@ -75,8 +78,6 @@ private:
     const T arr;
   };
 
-  std::vector<double>  estimateMotion (std::vector<Matcher::p_match> p_matched,
-                                       const std::vector<double> &initial_guess);
   Matrix               smallerThanMedian (Matrix &X,double &median);
   bool                 normalizeFeaturePoints (std::vector<Matcher::p_match> &p_matched,Matrix &Tp,Matrix &Tc);
   void                 fundamentalMatrix (const std::vector<Matcher::p_match> &p_matched,const std::vector<int32_t> &active,Matrix &F);
