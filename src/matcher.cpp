@@ -645,7 +645,16 @@ uint8_t* Matcher::createHalfResolutionImage(uint8_t *I,const int32_t* dims) {
   return I_half;
 }
 
-void Matcher::computeFeatures (uint8_t *I,const int32_t* dims,int32_t* &max1,int32_t &num1,int32_t* &max2,int32_t &num2,uint8_t* &I_du,uint8_t* &I_dv,uint8_t* &I_du_full,uint8_t* &I_dv_full) {
+void Matcher::computeFeatures (uint8_t *I,
+                               const int32_t* dims,
+                               int32_t* &max1,
+                               int32_t &num1,
+                               int32_t* &max2,
+                               int32_t &num2,
+                               uint8_t* &I_du,
+                               uint8_t* &I_dv,
+                               uint8_t* &I_du_full,
+                               uint8_t* &I_dv_full) {
   
   int16_t *I_f1;
   int16_t *I_f2;

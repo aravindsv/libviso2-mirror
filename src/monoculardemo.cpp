@@ -38,6 +38,7 @@ Street, Fifth Floor, Boston, MA 02110-1301, USA
 
 using namespace std;
 
+
 int main (int argc, char** argv) {
 
   // we need the path name to 2010_03_09_drive_0019 as input argument
@@ -52,6 +53,7 @@ int main (int argc, char** argv) {
   // set most important visual odometry parameters
   // for a full parameter list, look at: viso_stereo.h
   VisualOdometryStereo::parameters param;
+
 
   // calibration parameters for sequence 2010_03_09_drive_0019
   param.calib.f  = 645.24; // focal length in pixels
@@ -103,7 +105,7 @@ int main (int argc, char** argv) {
       }
 
       // status
-      cout << "Processing: Frame: " << i;
+      cout << "Processing: Frame: " << i << endl;
 
       // compute visual odometry
       int32_t dims[] = {width,height,width};

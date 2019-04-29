@@ -36,6 +36,7 @@ Street, Fifth Floor, Boston, MA 02110-1301, USA
 #include <viso_stereo.h>
 #include <png++/png.hpp>
 
+
 using namespace std;
 
 int main (int argc, char** argv) {
@@ -52,6 +53,7 @@ int main (int argc, char** argv) {
   // set most important visual odometry parameters
   // for a full parameter list, look at: viso_stereo.h
   VisualOdometryStereo::parameters param;
+
 
   // calibration parameters for sequence 2010_03_09_drive_0019
   param.calib.f  = 645.24; // focal length in pixels

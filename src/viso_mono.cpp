@@ -37,8 +37,9 @@ bool VisualOdometryMono::process (uint8_t *I,int32_t* dims,bool replace) {
   return updateMotion();
 }
 
-vector<double> VisualOdometryMono::estimateMotion (vector<Matcher::p_match> p_matched,
-                                                   const std::vector<double> &initial_guess) {
+vector<double> VisualOdometryMono::estimateMotion(
+  vector<Matcher::p_match> p_matched, 
+  const std::vector<double> &initial_estimate) {
 
   // get number of matches
   int32_t N = p_matched.size();
@@ -153,9 +154,9 @@ vector<double> VisualOdometryMono::estimateMotion (vector<Matcher::p_match> p_ma
   tr_delta[0] = rx;
   tr_delta[1] = ry;
   tr_delta[2] = rz;
-  tr_delta[3] = t.val[0][0];
-  tr_delta[4] = t.val[1][0];
-  tr_delta[5] = t.val[2][0];
+  tr_delta[3] = param.scale_factor*t.val[0][0];
+  tr_delta[4] = param.scale_factor*t.val[1][0];
+  tr_delta[5] = param.scale_factor*t.val[2][0];
   return tr_delta;
 }
 
