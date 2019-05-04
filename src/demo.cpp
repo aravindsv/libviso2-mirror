@@ -65,7 +65,9 @@ int main (int argc, char** argv) {
   mono_param.calib.f          = 645.24; // focal length in pixels
   mono_param.calib.cu         = 635.96; // principal point (u-coordinate) in pixels
   mono_param.calib.cv         = 194.13; // principal point (v-coordinate) in pixels
-  mono_param.height              = 1.7; // height above ground in meters
+  // mono_param.height              = 0.6; // height above ground in meters
+  // mono_param.pitch             = -0.08; // camera pitch
+  mono_param.height              = 1.7; // height above ground in meters for DynSLAM test
   mono_param.pitch             = -0.03; // camera pitch
   mono_param.scale_factor = mono_scale; // Scale for translational movement
 
@@ -104,6 +106,7 @@ int main (int argc, char** argv) {
   stereo_results.open("stereo_results.txt");
 
   // loop through all frames i=0:372
+  // for (int32_t i=0; i<372; i++) {
   for (int32_t i=0; i<100; i++) {
 
     // input file names
