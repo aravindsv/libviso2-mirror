@@ -30,11 +30,30 @@ VisualOdometryMono::~VisualOdometryMono () {
 }
 
 bool VisualOdometryMono::process (uint8_t *I,int32_t* dims,bool replace) {
+
+  // push back images
   matcher->pushBack(I,dims,replace);
-  matcher->matchFeatures(0);
+
+
+  // bootstrap motion estimate if invalid
+  Tr_valid = true;
+  if (!Tr_valid) {
+    printf("viso2 (%s): Tr was not valid; doing full feature match\n", __FILE__);
+    matcher->matchFeatures(0);
+    matcher->bucketFeatures(param.bucket.max_features,param.bucket.bucket_width,param.bucket.bucket_height);
+    p_matched = matcher->getMatches();
+    updateMotion();
+//    dynslam::utils::Toc();
+  }
+
+  // match features and update motion
+  if (Tr_valid) matcher->matchFeatures(0,&Tr_delta);
+  else          matcher->matchFeatures(0);
   matcher->bucketFeatures(param.bucket.max_features,param.bucket.bucket_width,param.bucket.bucket_height);
   p_matched = matcher->getMatches();
-  return updateMotion();
+  bool updateOk = updateMotion();
+
+  return updateOk;
 }
 
 vector<double> VisualOdometryMono::estimateMotion(
@@ -154,9 +173,9 @@ vector<double> VisualOdometryMono::estimateMotion(
   tr_delta[0] = rx;
   tr_delta[1] = ry;
   tr_delta[2] = rz;
-  tr_delta[3] = param.scale_factor*t.val[0][0];
-  tr_delta[4] = param.scale_factor*t.val[1][0];
-  tr_delta[5] = param.scale_factor*t.val[2][0];
+  tr_delta[3] = t.val[0][0];
+  tr_delta[4] = t.val[1][0];
+  tr_delta[5] = t.val[2][0];
   return tr_delta;
 }
 

@@ -32,14 +32,12 @@ public:
   struct parameters : public VisualOdometry::parameters {
     double                      height;           // camera height above ground (meters)
     double                      pitch;            // camera pitch (rad, negative=pointing down)
-    double                      scale_factor;     // scale to multiply translation by (since monocular depth estimation is only accurate up to scale)
     int32_t                     ransac_iters;     // number of RANSAC iterations
     double                      inlier_threshold; // fundamental matrix inlier threshold
     double                      motion_threshold; // directly return false on small motions
     parameters () {
       height           = 1.0;
       pitch            = 0.0;
-      scale_factor     = 1.0;
       ransac_iters     = 2000;
       inlier_threshold = 0.00001;
       motion_threshold = 100.0;

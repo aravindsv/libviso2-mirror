@@ -26,6 +26,8 @@ Street, Fifth Floor, Boston, MA 02110-1301, USA
   Usage: ./viso2 path/to/sequence/2010_03_09_drive_0019
 */
 
+#define DYNSLAM_TEST 0
+
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -50,10 +52,6 @@ int main (int argc, char** argv) {
 
   // sequence directory
   string dir = argv[1];
-  double mono_scale = 1.0;
-  if (argc >= 3) {
-    mono_scale = atof(argv[2]);
-  }
 
 
   // set most important visual odometry parameters
@@ -65,11 +63,13 @@ int main (int argc, char** argv) {
   mono_param.calib.f          = 645.24; // focal length in pixels
   mono_param.calib.cu         = 635.96; // principal point (u-coordinate) in pixels
   mono_param.calib.cv         = 194.13; // principal point (v-coordinate) in pixels
-  // mono_param.height              = 0.6; // height above ground in meters
-  // mono_param.pitch             = -0.08; // camera pitch
-  mono_param.height              = 1.7; // height above ground in meters for DynSLAM test
+  #if DYNSLAM_TEST
+  mono_param.height              = 1.5; // height above ground in meters for DynSLAM test
   mono_param.pitch             = -0.03; // camera pitch
-  mono_param.scale_factor = mono_scale; // Scale for translational movement
+  #else
+  mono_param.height              = 0.6; // height above ground in meters
+  mono_param.pitch             = -0.08; // camera pitch
+  #endif
 
   // stereo calibration parameters for sequence 2010_03_09_drive_0019
   stereo_param.calib.f  = 645.24; // focal length in pixels
@@ -106,15 +106,21 @@ int main (int argc, char** argv) {
   stereo_results.open("stereo_results.txt");
 
   // loop through all frames i=0:372
-  // for (int32_t i=0; i<372; i++) {
+  #if DYNSLAM_TEST
   for (int32_t i=0; i<100; i++) {
+  #else
+  for (int32_t i=0; i<372; i++) {
+  #endif
 
     // input file names
     char base_name[256]; sprintf(base_name,"%06d.png",i);
-    // string left_img_file_name  = dir + "/I1_" + base_name;
-    // string right_img_file_name = dir + "/I2_" + base_name;
+    #if DYNSLAM_TEST
     string left_img_file_name  = dir + "/image_0/" + base_name;
     string right_img_file_name = dir + "/image_1/" + base_name;
+    #else
+    string left_img_file_name  = dir + "/I1_" + base_name;
+    string right_img_file_name = dir + "/I2_" + base_name;
+    #endif
 
     bool stereo_succeeded = false;
     bool mono_succeeded = false;
@@ -157,7 +163,8 @@ int main (int argc, char** argv) {
         mono_times.push_back(elapsed_time.count());
 
         // on success, update current pose
-        mono_pose = mono_pose * Matrix::inv(mono_viso.getMotion());
+        auto delta = mono_viso.getMotion();
+        mono_pose = delta * mono_pose;
         monocular_results << mono_pose << endl << endl;
 
         // output some statistics
@@ -188,7 +195,8 @@ int main (int argc, char** argv) {
         stereo_times.push_back(elapsed_time.count());
 
         // on success, update current pose
-        stereo_pose = stereo_pose * Matrix::inv(stereo_viso.getMotion());
+        auto delta = stereo_viso.getMotion();
+        stereo_pose = delta * stereo_pose;
         stereo_results << stereo_pose << endl << endl;
 
         // output some statistics
