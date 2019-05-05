@@ -2,11 +2,17 @@
 cmake_minimum_required (VERSION 2.6)
 project (libviso2)
 
+add_subdirectory(momo)
+
 # directories
-set (Viso2_INCLUDE_DIRS src)
+set (Viso2_INCLUDE_DIRS inc)
+set (momo_INCLUDE_DIRS momo/inc)
+set (momo_SOURCE_DIRS momo/src)
 
 # include directory
 include_directories("${Viso2_INCLUDE_DIRS}")
+include_directories("${momo_INCLUDE_DIRS}")
+link_directories("${momo_SOURCE_DIRS}")
 
 # use sse3 instruction set and an optimized build; note that at least on modern versions of GCC
 # (5.4+) the -O3 flag is actually very important and can lead to 3-4x slowdown if not set!
@@ -29,8 +35,8 @@ set(Viso2_LIBS viso2 CACHE INTERNAL "")
 
 # demo program (unused; requires png++: sudo apt install libpng++-dev)
 add_executable(viso2-demo src/demo.cpp)
-target_link_libraries(viso2-demo viso2 png)
+target_link_libraries(viso2-demo viso2 png momo)
 add_executable(viso2-stereo-demo src/stereodemo.cpp)
-target_link_libraries(viso2-stereo-demo viso2 png)
+target_link_libraries(viso2-stereo-demo viso2 png momo)
 add_executable(viso2-monocular-demo src/monoculardemo.cpp)
-target_link_libraries(viso2-monocular-demo viso2 png)
+target_link_libraries(viso2-monocular-demo viso2 png momo)

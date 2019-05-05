@@ -36,7 +36,6 @@ bool VisualOdometryMono::process (uint8_t *I,int32_t* dims,bool replace) {
 
 
   // bootstrap motion estimate if invalid
-  Tr_valid = true;
   if (!Tr_valid) {
     printf("viso2 (%s): Tr was not valid; doing full feature match\n", __FILE__);
     matcher->matchFeatures(0);

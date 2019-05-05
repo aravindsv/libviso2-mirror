@@ -23,3 +23,5 @@ octave-workspace
 
 # Cmake build output
 build/
+
+CMakeFiles/
